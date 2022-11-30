@@ -7,7 +7,7 @@ prefix.id
 newval : new value for active ( 0 || 1 )
 */
 
-if (!isset($gCms)) exit;
+if( !defined('CMS_VERSION') ) exit;
 
 $newparams = isset($params['levelname'])?array('active_tab'=>$params['levelname']):array();
 

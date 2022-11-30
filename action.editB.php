@@ -1,5 +1,5 @@
 <?php
-if (!isset($gCms)) exit;
+if( !defined('CMS_VERSION') ) exit;
 $admintheme = $gCms->variables["admintheme"];
 if(isset($params["cancel"]) || ($this->GetPreference("restrict_permissions",false) && !$this->CheckPermission("youtubeplayer_advanced") && !$this->CheckPermission("youtubeplayer_manage_videos")) ){
 	$newparams = array("active_tab" => "videos");

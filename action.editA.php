@@ -1,13 +1,16 @@
 <?php
-if (!isset($gCms)) exit;
-$admintheme = $gCms->variables["admintheme"];
+if( !defined('CMS_VERSION') ) exit;
+
+$gCms = cmsms();
+$admintheme = cms_utils::get_theme_object();
+
 if(isset($params["cancel"]) || ($this->GetPreference("restrict_permissions",false) && !$this->CheckPermission("youtubeplayer_advanced") && !$this->CheckPermission("youtubeplayer_manage_category")) ){
 	$newparams = array("active_tab" => "category");
 	if(!isset($params["cancel"]))	$newparams["module_message"] = $this->Lang("error_denied");
 	$this->Redirect($id, "defaultadmin", $returnid, $newparams);
 }
 
-$db =& $this->GetDb();
+$db = $this->GetDb();
 
 
 if(isset($params["Aid"])) {

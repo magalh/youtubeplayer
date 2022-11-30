@@ -1,5 +1,5 @@
 <?php
-if (!isset($gCms)) exit;
+if( !defined('CMS_VERSION') ) exit;
 
 $db =& $this->GetDb();
 $dict = NewDataDictionary($db);

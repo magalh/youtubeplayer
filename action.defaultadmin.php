@@ -1,9 +1,12 @@
 <?php
-if (!isset($gCms)) exit;
-$admintheme = $gCms->variables["admintheme"];
-$active_tab = isset($params["active_tab"])?$params["active_tab"]:"category";
+if( !defined('CMS_VERSION') ) exit;
 
-$has_advanced_perm = $this->CheckPermission("youtubeplayer_advanced");
+$gCms = cmsms();
+$admintheme = cms_utils::get_theme_object();
+
+$active_tab = isset($params["active_tab"]) ? $params["active_tab"]:"category";
+
+$has_advanced_perm = $this->CheckPermission(YouTubePlayer::PERM_ADVANCED);
 
 $filter = $this->GetPreference("display_filter",false);
 $instantsearch = $this->GetPreference("display_instantsearch",false);
@@ -21,7 +24,7 @@ if($instantsort || $instantsearch){
 }
 
 echo $this->StartTabHeaders();
-	if( $has_advanced_perm || $this->GetPreference("tabdisplay_category",false) || $this->CheckPermission("youtubeplayer_manage_category") ) {
+	if( $has_advanced_perm || $this->GetPreference("tabdisplay_category",false) || $this->CheckPermission(YouTubePlayer::PERM_CAT) ) {
 		echo $this->SetTabHeader("category", $this->Lang("category_plural"), "category" == $active_tab ? true : false);
 	}
 	if( $has_advanced_perm || $this->GetPreference("tabdisplay_videos",false) || $this->CheckPermission("youtubeplayer_manage_videos") ) {
@@ -43,7 +46,7 @@ echo $this->EndTabHeaders();
 echo $this->StartTabContent();
 
 
-if( $has_advanced_perm || $this->GetPreference("tabdisplay_category",false) || $this->CheckPermission("youtubeplayer_manage_category") ) {
+if( $has_advanced_perm || $this->GetPreference("tabdisplay_category",false) || $this->CheckPermission(YouTubePlayer::PERM_CAT) ) {
 	echo $this->StartTab("category");
 
 		$whereclause = array();
@@ -51,10 +54,13 @@ if( $has_advanced_perm || $this->GetPreference("tabdisplay_category",false) || $
 
 		$this->smarty->assign("filter", $filteroutput);
 		$this->smarty->assign("instantsearch", $instantsearch?$this->Lang("searchthistable")." ".$this->CreateInputText($id, "searchtable_category", "", 10, 64, ' onkeyup="ctlmm_search(this.value,\'category_table\');"'):false);
-			
+		
 		$this->smarty->assign("addnew", $this->CreateLink($id, "editA", $returnid, $admintheme->DisplayImage("icons/system/newobject.gif", "","","","systemicon")." ".$this->Lang("add_category")));
-		$reorder_btn = false;if($has_advanced_perm || !$this->GetPreference("restrict_permissions",false) || $this->CheckPermission("youtubeplayer_manage_category"))	$reorder_btn = $this->CreateLink($id, "reorder", $returnid, $admintheme->DisplayImage("icons/system/reorder.gif", "","","","systemicon")." ".$this->Lang("reorder"));
-			
+		$reorder_btn = false;
+		if($has_advanced_perm || !$this->GetPreference("restrict_permissions",false) || $this->CheckPermission(YouTubePlayer::PERM_CAT)){
+			$reorder_btn = $this->CreateLink($id, "reorder", $returnid, $admintheme->DisplayImage("icons/system/reorder.gif", "","","","systemicon")." ".$this->Lang("reorder"));
+		}
+
 		$this->smarty->assign("reorder", $reorder_btn);
 		
 			$itemlist = $this->get_level_category(isset($whereclause)?$whereclause:array(),true, $id, $returnid);
@@ -66,7 +72,7 @@ if( $has_advanced_perm || $this->GetPreference("tabdisplay_category",false) || $
 				array($this->Lang("reorder"),"movelinks",true),
 				array($this->Lang("Actions"),"deletelink",true)		
 				);
-			if($instantsort && count($itemlist)>1){
+			if($instantsort && is_countable($itemlist) && count($itemlist) > 1){
 				$i = 0;
 				while($i<count($adminshow)){
 					if(!$adminshow[$i][2])	$adminshow[$i][0] = '<div style="float:left;"><a style="cursor: pointer;" onclick="ctlmm_sortRows(\'category_table\','.$i.');"><img src="themes/default/images/icons/system/sort_up.gif" alt="^"/></a><br/><a style="cursor: pointer;" onclick="ctlmm_sortRows(\'category_table\','.$i.',true);"><img src="themes/default/images/icons/system/sort_down.gif" alt="v"/></a></div><div style="line-height: 24px;"> &nbsp;'.$adminshow[$i][0]."</div>";
@@ -124,7 +130,7 @@ if( $has_advanced_perm || $this->GetPreference("tabdisplay_videos",false) || $th
 				array($this->Lang("reorder"),"movelinks",true),
 				array($this->Lang("Actions"),"deletelink",true)		
 				);
-			if($instantsort && count($itemlist)>1){
+			if($instantsort && is_countable($itemlist) && count($itemlist) > 1){
 				$i = 0;
 				while($i<count($adminshow)){
 					if(!$adminshow[$i][2])	$adminshow[$i][0] = '<div style="float:left;"><a style="cursor: pointer;" onclick="ctlmm_sortRows(\'videos_table\','.$i.');"><img src="themes/default/images/icons/system/sort_up.gif" alt="^"/></a><br/><a style="cursor: pointer;" onclick="ctlmm_sortRows(\'videos_table\','.$i.',true);"><img src="themes/default/images/icons/system/sort_down.gif" alt="v"/></a></div><div style="line-height: 24px;"> &nbsp;'.$adminshow[$i][0]."</div>";

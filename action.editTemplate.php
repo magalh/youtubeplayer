@@ -1,5 +1,5 @@
 <?php
-if (!isset($gCms)) exit;
+if( !defined('CMS_VERSION') ) exit;
 
 if( isset($params['cancel']) )	$this->Redirect($id, 'defaultadmin', $returnid, array('active_tab'=>'templates') );
 
