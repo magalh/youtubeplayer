@@ -1,0 +1,895 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+		
+	<title>CTLModuleMaker FAQ</title><style>
+		a { text-decoration: none; }
+		a:hover { text-decoration: underline; }
+		div.qdiv { margin: 25px 25px 80px 25px; }
+		h1 {
+			text-align: right;
+			margin-bottom: 0;
+		}
+		div#notice {
+			text-align: right;
+		}
+		#menu {
+			font-family: Verdana;
+			padding: 25px 0 25px 75px;
+			font-weight: bold;
+		}
+		#menu li {
+			margin: 2px;
+		}
+		div.answer {
+			background-color : #e1ecfe;
+			padding: 10px;
+			border: 1px solid Darkblue;
+			border-top: none;
+		}
+		div.question { 
+			font-weight: bold;
+			background-color : #a4c5ff;
+			padding: 10px;
+			border: 1px solid Darkblue;
+			border-bottom: none;
+		}
+		.code {
+			display: block;
+			background-color: LightGrey;
+			border: 1px solid DarkGrey;
+			padding: 5px;
+			margin: 10px;
+		}
+		
+			
+	</style></head>
+<body>
+<h1>CTLModuleMaker FAQ</h1>
+<div id="notice">Covers the created modules, not CTLModuleMaker itself...</div>
+<ul id="menu">
+
+	<li><a href="#q10">Modifying the module - where to start?</a></li>
+	<li><a href="#q9">Can I put <i>smarty tags</i> in the item's fields?</a></li>
+	<li><a href="#q5">How can I retrieve <i>images</i> in the display templates?</a></li>
+	<li><a href="#q12">How can I display values inside an <i>Array</i>?</a></li>
+	<li><a href="#q15">How can I change the <i>dates display format</i>?</a></li>
+	<li><a href="#q18">How can I format the <i>page menu</i>?</a></li>
+	<li><a href="#q22">How can I display a list of elements sorted in a certain way?</a></li>
+	<li><a href="#q6">I'm trying to display a list of items, but the detail template is used instead. What's going on?</a></li>
+	<li><a href="#q21">Can I integrate the <i>Comments</i> module?</a></li>
+	<li><a href="#q11">Warning: module <i>"is not properly cleaning input params."</i> What's going on?</a></li>
+	<li><a href="#q13">How can I retrieve informations about an object other than the one I'm watching?</a></li>
+	<li><a href="#q1">Can I change the field inputs that are displayed in the module's <i>search form</i>?</a></li>
+	<li><a href="#q4">Can I change the <i>edit form</i> for a level?</a></li>
+	<li><a href="#q17">How can I add a <i>condition</i> for and element's input to be accepted?</a></li>
+	<li><a href="#q7">How are the defaultadmin panels generated?</a></li>
+	<li><a href="#q2">Could I show the name of the selected item in, say, the page's &lt;title&gt; tag?</a></li>
+	<li><a href="#q16">How can I add module elements to my <i>google sitemap</i>?</a></li>
+	<li><a href="#q19">How can I add an expiration field?</a></li>
+	<li><a href="#q20">How can I setup the frontend edit action with the Front End Users module?</a></li>
+	<li><a href="#q3">Can I change how the <i>pretty urls</i> are generated and interpreted?</a></li>
+	<li><a href="#q8">Can I make my module always act as if the "forcelist" parameter was enabled?</a></li>
+	<li><a href="#q14">What's with this get_moduleGetVars() function?</a></li>
+	
+</ul>
+
+<div id="questions">
+
+
+	<div class="qdiv" id="q10">
+		<div class="question">Modifying the module - where to start?</div>
+		<div class="answer">
+		<p>To get you started, here's a basic explanation of the structure of the created module.</p>
+		<p><b>The language files</b></p>
+		<p>In
+the lang/ folder, you will find one file for each supported language.
+Inside each file, you should have several lines that look like this:</p>
+		<pre class="code">$lang["postinstall"] = "Module successfully added.";</pre>
+		<p>This
+line defines a string referred to as "postinstall". In every language
+file, there should be a string for this key. When the modules wishes to
+display some text, it will look for the string corresponding to the key
+in the language file corresponding to the user's language. You will
+most likely wish to change these files, but be careful. Each string is
+delimited with quotes (either ' or "), and obviously you can't use
+these delimiters inside the string. If you wish to do so, you'll have
+to use an escape sign : \" will display a quote without being
+considered as a delimiter.</p>
+		<p><b>The templates</b></p>
+		<p>The
+files in the templates/ folder contain no php - just plain html and
+smarty tags. They are used for the layout of most actions.<br>
+		</p><p><i>adminpanel.tpl</i> is the layout for the list of elements of each level in the admin panel (to modify this, see <a href="#q7">this topic</a>)<br>
+		<i>noresult.tpl</i> is used when there are no item to display. Typically, this is just a message saying that nothing was found.<br>
+		<i>search.tpl</i>
+is the template for the simple search form (when calling the search
+action with searchmode="simple"), which searches in all levels.<br>
+		<i>search_generalresults.tpl</i>
+is the template for the search results when you are searching in more
+than one level (otherwise, the default list template for that level is
+used).<br>
+		<i>browsefiles.tpl</i> is the template used for the file selection page (when using table display).<br>
+		For each level, you should have a <i>editLEVELPREFIX.tpl</i>, a <i>search_LEVELNAME.tpl</i> and possibly a <i>frontend_add_LEVELPREFIX.tpl</i>.
+The first is the template for the admin form, when an item of this
+level is added or edited. The second is the template for the advanced
+search form. The last is the template for the frontend add action for
+this level (if you chose to create one).</p>
+		<p><b>The action files</b></p>
+		<p>In
+the root of the module folders, you will notice that files have a
+prefix (either "action" or "method"), except for the module file (<i>modulename.module.php</i>),
+which contains the most important parts of the code. Methods are called
+when the module is installed, uninstalled, or upgraded - and at no
+other moment. Actions, on the other hand, are called everytime the cms
+asks the module to do something - either in the frontend or the admin.
+But the module has more actions than the files you see there. Open the
+module file (<i>modulename.module.php</i>), and look for the function <b>DoAction</b> (should be around the 400th line). You should see something like this:</p>
+		<pre class="code">	function DoAction($action, $id, $params, $returnid=-1){<br>		global $gCms;<br>		switch($action){<br>			case "link":<br>				echo $this-&gt;CreateLink($id,"default",$returnid,"",$params,"",true);<br>				break;<br>			case "changedeftemplates":<br>				foreach($params as $key=&gt;$value){<br>				    if($key != "submit")	   $this-&gt;setPreference($key, $value);<br>				}<br>				$this-&gt;Redirect($id, "defaultadmin", $returnid, array("active_tab"=&gt;"templates", "module_message"=&gt;"message_modified"));<br>				break;<br>			case "deletetpl":<br>				$newparams = array("active_tab"=&gt;"templates");<br>				$deftemplates = $this-&gt;getDefaultTemplates();<br>			    if(isset($params["tplname"]) &amp;&amp; !in_array($params["tplname"], $deftemplates)){<br>				    if($this-&gt;DeleteTemplate($params["tplname"]))	   $newparams["module_message&gt;"] = $this-&gt;lang("message_modified");<br>				}<br>				$this-&gt;Redirect($id, "defaultadmin", $returnid, $newparams);<br>				break;</pre>
+		<p>and so on...<br>
+Some actions (mostly because they are small) don't have their own file.
+Each "case", here, is such an action. When asked for an action that is
+not in the list, the module will look for the according file
+(action.ACTIONNAME.php).</p>
+		<p>So here's a short description of the actions you might notice in your module:
+		</p><ul>
+		<li><i>link</i>: the frontend "link" action, which creates a link to another action</li>
+		<li><i>default</i>: the frontend default action, which displays elements or list of elements</li>
+		<li><i>search</i>: the frontend "search" action, which displays the search form and search results</li>
+		<li><i>frontend_edit</i>: the frontend action to add/edit elements (breaks into FEadd_* actions)</li>
+		<li><i>defaultadmin</i>: the action for the admin panel which displays the list of levels, elements, templates and so on</li>
+		<li><i>editTemplate</i>: when a module template is edited</li>
+		<li><i>deletetpl</i>: when a module template is deleted</li>
+		<li><i>add_optionvalue</i>,<i>rename_optionvalue</i>,<i>move_optionvalue</i> and <i>delete_optionvalue</i> manage the options for the dynamic list fields</li>
+		<li><i>editLEVELPREFIX</i>: for each level, the action to add or edit an element of the level</li>
+		<li><i>toggle</i>: used when a link in the adminpanel is clicked to change the "active" or "default" value of an element</li>
+		<li><i>movesomething</i>: used when the order of elements is changed in the admin panel, or when an element is deleted</li>
+		<li><i>browsefiles</i>: used when you select a file for an element. It displays a list of the current files and the upload form.</li>
+		<li><i>addfiles</i>: used when new file(s) is(are) uploaded. This action is called from the browsefiles action (images are resized here).</li>
+		<li><i>assignfile</i>: assigns an existing file to the item in the database</li>
+		</ul>
+		<p><b>The functions</b></p>
+		<p>Aside
+from DoAction, the module file contains a lot of functions that are
+used in any action. Most of them are simply procedures that the module
+needs to do quite often. I've tried to comment them at least to say
+what they're there for, but here I'll try to describe some of the most
+important ones.</p>
+		<ul>
+		<li>The <i>BuildPrettyUrls()</i> and <i>SetParameters()</i> functions control are mostly used for pretty urls (more informations <a href="#q3">here</a>)</li>
+		<li>The <i>get_moduleGetVars()</i>
+is used to retrieve informations from the url about other calls of the
+module. In most cases, this is what provides the $item-&gt;is_selected
+attribute of items.</li>
+		<li>The <i>plResize()</i> function (located in function.plresize.php) is used to resize images and create thumbnails</li>
+		<li>For each level, you will have a <i>get_level_NAMEOFLEVEL()</i>.
+There are among the most important, as they are call everything an
+element (or list of elements) is requested. It will be explained below.</li>
+		<li>The <i>addadminlinks()</i> function is used for the admin panel and is called from within a <i>get_level_NAMEOFLEVEL()</i> function. It takes every item and add links to edit, move, delete the item and so on.</li>
+		</ul>
+		<p><b>The get_level functions</b></p>
+		<p>Each <i>get_level_NAMEOFLEVEL()</i>
+function queries elements from the database, creates an object for
+each, and return an array of these objects (basically, the $itemlist
+you're using in templates).<br>
+		The function accepts several parameters, which I'll exlain here:</p>
+		<ul>
+		<li><i>$where</i> is an array of conditions, in the form $field=&gt;$value. For example, <code>$where=array("active"=&gt;1)</code> would mean that only the items were the "active" field is equal to 1 are queried.</li>
+		<li><i>$admin</i>
+controls whether the addadminlinks() just discussed should be called.
+If it is, the $id and $returnid parameters are necessary. Otherwise
+they aren't.</li>
+		<li><i>$order</i> controls the way the list of
+elements should be ordered. Possible values are "modified", "created",
+"name" or false (in which case the item order defined in the admin
+panel is used)</li>
+		<li><i>$limit</i> controls the maximum amount of items that should be returned</li>
+		<li><i>$customwhere</i> and <i>$customvalues</i>
+are used to override the $where parameter. When you want to create a
+query more complicated than the $where parameter allows, you can
+provide the string query in $customwhere and the array of values in
+$customvalues.</li>
+		</ul>
+		<p>Hope this gets you going. If you have
+any question, or wish to share the modifications you've done, feel to
+contact me, either at the forge or on the forum.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+
+
+	<div class="qdiv" id="q9">
+		<div class="question">Can I put smarty tags in the item's fields?</div>
+		<div class="answer">
+		<p>Yes.</p>
+		<p>Let's
+say you have products which have a description field, and in that
+description you would like to put some smarty code. If you try and put,
+say, {title} in an attempt to display the page title, you should notice
+that "{title}" will be displayed exactly like that in the product's
+description. That is because items' fields aren't evaluated.</p>
+		<p>However, in your template, you may choose to evaluate the fields. For example, in your template, if instead of the simple <code>{$item-&gt;description}</code> you write:</p>
+		<pre class="code">{eval var=$item-&gt;description}</pre>
+		<p>You will then notice that {title} is evaluated, and the page's title is displayed.<br>
+		</p></div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+
+
+	<div class="qdiv" id="q5">
+		<div class="question">How can I retrieve images in the display templates?</div>
+		<div class="answer">
+		<p>You put {$item-&gt;imagefield} in your template, and the image doesn't show up...</p>
+		<p>That's pretty much normal. $item-&gt;imagefield is itself an object, that has several attributes:</p>
+		<ul>
+			<li>$item-&gt;imagefield-&gt;filepath (relative url)</li>
+			<li>$item-&gt;imagefield-&gt;ext (the file extension)</li>
+			<li>$item-&gt;imagefield-&gt;url (absolute url)</li>
+			<li>$item-&gt;imagefield-&gt;size (size in bytes)</li>
+			<li>$item-&gt;imagefield-&gt;size_wformat (formated size)</li>
+			<li>$item-&gt;imagefield-&gt;imagesize (for images only)</li>
+			<li>$item-&gt;imagefield-&gt;width (for images only)</li>
+			<li>$item-&gt;imagefield-&gt;height (for images only)</li>
+			<li>$item-&gt;imagefield-&gt;image (image tag; for images only)</li>
+			<li>$item-&gt;imagefield-&gt;thumbnail (thumbnail url, if applicable)</li>
+			<li>$item-&gt;imagefield-&gt;filemtime (last modified, unix time)</li>
+			<li>$item-&gt;imagefield-&gt;modified (last modified, formated time)</li>
+		</ul>
+		<p>To
+display the image, you can use {$item-&gt;imagefield-&gt;image}, or if
+you wish more options, you can create the image tag yourself:<br>
+		</p><pre class="code">&lt;img src="uploads/{$item-&gt;imagefield-&gt;filepath}" alt=""/&gt;</pre><p></p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+
+
+	<div class="qdiv" id="q12">
+		<div class="question">How can I display values inside an Array?</div>
+		<div class="answer">
+		<p>If
+you have a list field that allows multiple choices (checkboxes or
+select list) and simply use {$item-&gt;fieldname} or
+{$item-&gt;fieldname_namevalue} in your template, you'll probably end
+up with this being displayed:</p><pre class="code">Array</pre>
+		<p>This
+is normal. As the field contains (or can contain) multiple values, it
+is indeed an array of values. To get the values themselves, you have to
+iterate through the values in a way like this:</p>
+		<pre class="code">&lt;ul&gt;<br>	{foreach from=$item-&gt;fieldname_namevalue item="onevalue"}<br>		&lt;li&gt;{$onevalue}&lt;/li&gt;<br>	{/foreach}<br>&lt;/ul&gt;</pre>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+
+	<div class="qdiv" id="q15">
+		<div class="question">How can I change the <i>dates display format</i>?</div>
+		<div class="answer">
+		<p>Posted By: Solutic on Date: 2009-05-07 10:31<br>
+		Use: <code>{$item-&gt;yourVar|date_format:"%H:%M"}</code></p>
+		<p><a href="http://www.smarty.net/manual/en/language.modifier.date.format.php">See the smarty entry about date format modifier</a> or the most useful <a href="http://www.smarty.net/manual/en/language.modifiers.php">smarty list of variable modifiers</a>.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+
+	<div class="qdiv" id="q18">
+		<div class="question">How can I format the page menu?</div>
+		<div class="answer">
+		<p>The
+function that generates the pagemenu is split_into_pages (in module
+file), but you should be able to format it the way you like without
+modifying the function.</p>
+		<p><b>Classes and CSS</b><br> The
+pagemenu is in a div with class "pagination". Each page number is an
+anchor(&lt;a&gt;) with class "pagenumber", and the current page also
+has the class "current". The "..." shown when there are too many pages
+are spans with the class "pagemenuoverflow", and the left and right
+arrows are anchors respectively with classes "previouslink" and
+"nextlink".<br>
+		You may use these classes to style your page menu. You can find examples of styles <a href="http://www.mis-algoritmos.com/2007/03/16/some-styles-for-your-pagination/" target="_blank">here</a> (I tried to use the same classes, but for uniformity reasons I didn't use spans, so double-check the css).</p>
+		<p><b>Strings</b><br>
+To change the page delimiter ("|") or the "...", look at the first
+lines language files, respectively at the entries "pagemenudelimiter"
+and "pagemenuoverflow".<br>
+		As for the &lt; and &gt;, they are hard-coded in the function split_into_pages, but it shouldn't be too difficult to change.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+	
+	<div class="qdiv" id="q22">
+		<div class="question">How can I display a list of elements sorted in a certain way?</div>
+		<div class="answer">
+		<p>We will look at how to create a list of sorted elements in the following way:</p>
+		<ul>
+			<li>[Sorting field]<ul>
+				<li>[element]</li>
+				<li>[element]</li>
+				<li>[element]</li>
+			</ul></li>
+			<li>[Sorting field]<ul>
+				<li>[element]</li>
+				<li>...</li>
+			</ul></li>
+		</ul>
+		<p>The basic idea will be to order elements by the sorting field, and notice when there's a change.</p><br>
+		<p><b>Order by parents</b><br>
+		Create the following template (which I'll call "order_by_parents"):</p>
+		<pre class="code">			&lt;ul&gt;<br>			{assign var="parentflag" value=false}<br>			{foreach from=$itemlist item="item"}<br>				{if $item-&gt;parent_name != $parentflag}<br>					{if $parentflag}&lt;/ul&gt;&lt;/li&gt;{/if}<br>					&lt;li&gt;{$item-&gt;parent_name}&lt;ul&gt;<br>					{assign var="parentflag" value=$item-&gt;parent_name}<br>				{/if}<br>				&lt;li&gt;{$item-&gt;name}&lt;/li&gt;<br>			{/foreach}<br>			&lt;/ul&gt;<br>		</pre>
+		<p>and call it using {cms_module module="mymodule" what="item" listtemplate="order_by_parents" orderby="parent"}</p>
+		<p><b>Order by field</b><br>
+Let's say your level has a dropdown field named "myfield", and you wish
+to list elements sorted on that field. Create the following template
+(which I'll call "order_by_myfield"):</p>
+		<pre class="code">			&lt;ul&gt;<br>			{assign var="fieldflag" value=false}<br>			{foreach from=$itemlist item="item"}<br>				{if $item-&gt;myfield != $fieldflag}<br>					{if $fieldflag}&lt;/ul&gt;&lt;/li&gt;{/if}<br>					&lt;li&gt;{$item-&gt;myfield}&lt;ul&gt;<br>					{assign var="fieldflag" value=$item-&gt;myfield}<br>				{/if}<br>				&lt;li&gt;{$item-&gt;name}&lt;/li&gt;<br>			{/foreach}<br>			&lt;/ul&gt;<br>		</pre>
+		<p>and call it using {cms_module module="mymodule" what="item" listtemplate="order_by_myfield" orderby="myfield"}</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+
+	<div class="qdiv" id="q6">
+		<div class="question">I'm trying to display a list of items, but the detail template is used instead. What's going on?</div>
+		<div class="answer">
+		<p>If
+you're on the final level and there's only one item to show, the module
+won't display the list view but will immediately show the details of
+this item, so that the user doesn't have to click twice for no reason.</p>
+		<p>If
+you want to display the list view anyway, there is now a "forcelist"
+parameter that will do the job (see the help of your module). Your tag
+should become:</p>
+		<pre class="code">{cms_module module="products" what="product" forcelist="1"}</pre>
+		<p>To set forcelist to true by default, <a href="#q8">look here</a>.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+
+	<div class="qdiv" id="q21">
+		<div class="question">Can I integrate the <i>Comments</i> module?</div>
+		<div class="answer">
+		<p><b>Yes.</b> In fact, the Comments module makes this very easy for any other module.</p>
+		<p>Open the detail template for your last level elements, and simply add this:</p>
+		<pre class="code">{cms_module module="comments" modulename="NAMEOFYOURMODULE" pageid=$item-&gt;id}</pre>
+		<p>Where NAMEOFYOURMODULE is, of course, the name of your module.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+
+	<div class="qdiv" id="q11">
+		<div class="question">Warning: module "is not properly cleaning input params." What's going on?</div>
+		<div class="answer">
+		<p style="color: red; font-weight: bold;">[*** Thanks to ikulis, this was definitely fixed in 1.8.4.2 and shouldn't be a problem anymore ***]</p>
+		<p>The
+advanced search form would need to register a param for each field of
+each level, which I find rather inelegant. For that reason the
+RestrictUnknownParams option has been disabled.</p>
+		<p><b>If you are not using the advanced search form</b>,
+you can safely activate the RestrictUnknownParams() option. Edit the
+module file (modulename.module.php), find the SetParameters() function,
+and edit the following line : </p><pre class="code">		$this-&gt;RestrictUnknownParams(false);</pre>
+		to:
+		<pre class="code">		$this-&gt;RestrictUnknownParams();</pre><p></p>
+		<p><b>If you do use the advanced search</b>, I would suggest disabling the "Allow parameter checks to create warning messages" in the CMS Global Settings.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+
+	<div class="qdiv" id="q13">
+		<div class="question">How can I retrieve informations about an object other than the one I'm watching?</div>
+		<div class="answer">
+		<p>In any module template, you can retrieve a whole item object using the following smarty tag: <code>{MODULENAME_get_levelitem}</code>.</p>
+		<p>The
+tag requires 3 parameters : what (retrieve an item from which level),
+alias (the item's alias) and assign (in which smarty variable this
+should be stored).<br>
+		So a typical example would be:</p>
+		<pre class="code">		{mymodule_get_levelitem what="category" alias="myfirstcategory" assign="catobject"}</pre>
+		<p>And you can then use the assigned object to display information:</p>
+		<pre class="code">		{$catobject-&gt;name}</pre>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+		
+
+	<div class="qdiv" id="q1">
+		<div class="question">Can I change the field inputs that are displayed in the module's advanced search form?</div>
+		<div class="answer">
+		<p><b>Yes.</b></p>
+		<p>From
+CTLModuleMaker 1.8.3, it is possible to define which fields will be
+shown in the advanced search form upon field creation. If you have
+created your module with an earlier version or do not want to create it
+again, there's another way around.</p>
+		<p>The search form for the
+module's search action are generated from templates that can be found
+in the "templates" folder of your module.</p>
+		<p>The "search.tpl" file is the template for the search form when the "simple" searchmode is chosen.</p>
+		<p>The
+"search_generalresults.tpl" file is the template for the search results
+when we are searching in more than one level at the same time.
+Otherwise, the level's default list module is used.</p>
+		<p>For each
+level of your module, there should be a file named
+"search_NAMEOFTHELEVEL.tpl". This contains the template for the
+advanced search form for this level. If you want to remove a field
+input from the search form, you can simply delete the appropriate
+section of the template. (I would recommand to make a backup of the
+original template, if you ever change your mind!)</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+	
+	<div class="qdiv" id="q4">
+		<div class="question">Can I change the edit form for a level?</div>
+		<div class="answer">
+		<p><b>Yes.</b></p>
+		<p>The
+edit forms for each level are generated from templates that can be
+found in the "templates" folder of your module. For each level of your
+module, the template for the edit formre should be in a file named
+"editPREFIXOFTHELEVEL.tpl".</p>
+		<p>You can modify the template, but keep two things in mind:<br>
+		- If you remove an input, the form might not work anymore.<br>
+		- If you wish to change the field labels, you should preferably do so in the language file.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+	
+	<div class="qdiv" id="q17">
+		<div class="question">Can I add a condition for and element's input to be accepted?</div>
+		<div class="answer">
+		<p>One
+of your level has, for example, a numeric field (which we'll call
+"myfield"), and you wish to make sure it's between, say, 0 and 100? Of
+course it's possible, but you'll need to edit the code.</p>
+		<p>Open
+the edit file associated with the level (action.editLEVELPREFIX.php).
+Somewhere not so far from the beginning of the file, you will find the
+following code :</p>
+		<pre class="code">		// CHECK IF THE NEEDED VALUES ARE THERE<br>#1		if(	!isset($params["itemname"]) || $params["itemname"] == "" ){<br>#2			echo $this-&gt;ShowErrors($this-&gt;Lang("error_missginvalue"));<br>#3		}elseif(false == $this-&gt;checkalias("module_modulename_item", $item-&gt;alias, isset($params["itemid"])?$params["itemid"]:false)){<br>#4			echo $this-&gt;ShowErrors($this-&gt;Lang("error_alreadyexists"));<br>#5		}else{<br>		############ DOING THE UPDATE<br>		</pre>
+		<p>Here
+two conditions are checked before updating/adding the element: first,
+on line #1, we check if a name was given (and any other mandatory
+value, if any), and if it wasn't, we display an error (line #2). On
+line #3, we check if another element already has the same alias and
+display an error message (line #4) if it is the case. If no problem is
+met, we get to line #5 and go on with the update.</p>
+		<p>Basically, you can add any condition you like to these. So with our example, it could look like this:</p>
+		<pre class="code">		// CHECK IF THE NEEDED VALUES ARE THERE<br>		if(	!isset($params["itemname"]) || $params["itemname"] == "" ){<br>			echo $this-&gt;ShowErrors($this-&gt;Lang("error_missginvalue"));<br>		}elseif(false == $this-&gt;checkalias("module_modulename_item", $item-&gt;alias, isset($params["itemid"])?$params["itemid"]:false)){<br>			echo $this-&gt;ShowErrors($this-&gt;Lang("error_alreadyexists"));<br>		}elseif( false == ($item-&gt;myfield &gt; 0 &amp;&amp; $item-&gt;myfield &lt;= 100) ){<br>			echo $this-&gt;ShowErrors($this-&gt;Lang("my_custom_error_message"));<br>		}else{<br>		############ DOING THE UPDATE<br>		</pre>
+		<p>We
+just check if the field is over 0 and below/equal to 100. If it is, we
+go on with the submission. Otherwise we display an error message (which
+you'd need to add to the language files, otherwise you can hardcode the
+error message...)</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+	
+	<div class="qdiv" id="q7">
+		<div class="question">How are the defaultadmin panels generated?</div>
+		<div class="answer">
+		<p>If
+you open the /templates/ folder, you will notice that there's only one
+template for the defaultadmin : adminpanel.tpl. This is used for all
+levels. So the difference is the information passed to the template.
+Before taking a look at it, let's see that information.<br>
+		Open the action.defaultadmin.php of your module. You will notice that it is divided into tabs (delimited by <code>echo $this-&gt;StartTab("nameoflevel");</code> and <code>echo $this-&gt;EndTab();</code>). For each level tab, the list of its items is fetched and stored into <code>$itemlist</code>, which is then passed to smarty. $itemlist is an array of objects having your fields as attributes ($item-&gt;field).<br>
+		Just below that, you will notice lines that look like this:</p>
+		<pre class="code">		$adminshow = array(<br>			array($this-&gt;Lang("name"),"editlink",false),<br>			array($this-&gt;Lang("alias"),"alias",false),<br>			array($this-&gt;Lang("active"),"toggleactive",true),<br>			array($this-&gt;Lang("nbchildren"),"nbchildren",false),<br>			array($this-&gt;Lang("reorder"),"movelinks",true),<br>			array($this-&gt;Lang("Actions"),"deletelink",true)		<br>			);<br>		$this-&gt;smarty-&gt;assign("adminshow", $adminshow);<br>		$this-&gt;smarty-&gt;assign("tableid", "levelname_table");<br>		echo $this-&gt;ProcessTemplate("adminpanel.tpl");</pre>
+		<p>The <code>$adminshow</code>
+variable contains what should be shown in the adminpanel of that level.
+We then pass this variable to smarty (and also a name for the table),
+and the last line tells smarty to display the template "adminpanel.tpl".<br>
+$adminshow is an array, where each element represents a column of the
+adminpanel. Each column, in turn, is an array containing three values:
+the first (position 0) is the title of the column, and the second
+(position 1) is the name of the object's field that should be shown in
+this column, and the third (position 2) is whether the instant search
+(the searchbox just at the top of the adminpanel) should skip this
+column.</p>
+		<p>For example, <code>array($this-&gt;Lang("name"),"editlink",false)</code>
+means, here, that we take $this-&gt;Lang("name") ("name" in the
+language that is currently displayed) to be the title of the column,
+and that for each row of the table, whatever is in
+$oneitem-&gt;editlink will be displayed (this particular value is not
+strictly speaking a field of the level, but an attribute created by the
+addadminlinks() function). It also means that the instant search will <i>not</i> skip this column, so the text displayed will be used to see if the row matches the search words.</p>
+		<p>Now, let's take a look at the adminpanel.tpl file:</p>
+		<pre class="code">#1		&lt;div&gt;<br>#2		&lt;table {if $tableid}id="{$tableid}" {/if}cellspacing="0" class="pagetable"&gt;<br>#3		&lt;thead&gt;&lt;tr&gt;<br>#4			{foreach from=$adminshow item=column}<br>#5				&lt;th&gt;{$column[0]}&lt;/th&gt;<br>#6			{/foreach}<br>#7		&lt;/tr&gt;&lt;/thead&gt;<br>#8		&lt;tbody&gt;<br>#9		{cycle values="row2,row1" assign=rowclass reset=true}<br>#10		{foreach from=$itemlist item=oneitem}<br>#11		{cycle values="row2,row1" assign=rowclass}<br>#12		&lt;tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';"&gt;<br>#13			{foreach from=$adminshow item=column}<br>#14				{assign var=oneval value=$column[1]}<br>#15				&lt;td{if $column[2]} class="ctlmm_nosearch"{/if}&gt;{$oneitem-&gt;$oneval}&lt;/td&gt;<br>#16			{/foreach}<br>#17		&lt;/tr&gt;<br>#18		{/foreach}<br>#19		&lt;/tbody&gt;<br>#20		&lt;/table&gt;<br>#21		&lt;/div&gt;</pre>
+		<p>Now,
+I will assume that everyone understands the html tags, and will leave
+alone the code concerning the classes. I will explain lines #4 to #6,
+which write the table header (the titles of the columns), and lines #9
+to #18, which write the table rows.</p>
+		<p>Line #5 is executed for
+each element of the $adminshow variable; in other words, for each
+column of the table. Now, remember that each element of the $adminshow
+variable is an array of two elements, so what line #5 does is display
+the first (position [0]) of these two elements as the column header.</p>
+		<p>Lines
+#11 to #17 are repeated for each item in $itemlist (for each row of the
+table). For each row, for each element of the $adminshow variable,
+lines #14 and #15 are repeated. Line #14 fetch the name of the object's
+attribute that should be displayed (position [1] of the adminshow
+element), and line #15 displays this attribute of the current object.</p>
+		<p>As of the <code>ctlmm_nosearch</code> class, it only means that the instant search will not check into this column.</p>
+		<p><b>Alright... how can I change this?</b></p>
+		<p>If
+you want to make major changes, the best thing to do would be to create
+an individual template for your level. In the templates/ folder, create
+a file (like "adminpanel_nameoflevel.tpl"), put the template you wish
+to use in it, and in the according tab of the action.defaultadmin.php
+file, change<br>
+		<code>echo $this-&gt;ProcessTemplate("adminpanel.tpl");</code><br>
+		to<br>
+		<code>echo $this-&gt;ProcessTemplate("adminpanel_nameoflevel.tpl");</code></p>
+		<p>Now,
+let's say you wish to make a very simple modification. For example, you
+are displaying a file field (which we'll call "myfield") on the
+adminpanel, but instead of showing the filepath you would like to show
+the picture. What you could do is this:<br>
+		In the adminpanel.tpl template file, you could change line #15 to something like this:
+		</p><pre class="code">			&lt;td{if $column[2]} class="ctlmm_nosearch"{/if}&gt;<br>			{if $oneval == 'myfield'}<br>				{if $oneitem-&gt;$oneval != ""}&lt;img src="{root_url}/uploads/{$oneitem-&gt;$oneval}" /&gt;{/if}<br>			{else}<br>				{$oneitem-&gt;$oneval}<br>			{/if}&lt;/td&gt;</pre>
+		<p>This
+means that smarty checks if the field we're displaying is 'myfield', if
+it is, and if the value isn't empty, it displays the image. If it
+isn't, it just displays the field value normally.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>	
+	
+	
+	<div class="qdiv" id="q2">
+		<div class="question">Could I show the name of the selected item in, say, the page's &lt;title&gt; tag?</div>
+		<div class="answer">
+		<p style="color: red; font-weight: bold;">[*** See update below... ***]</p>
+		<p><b>The short answer:</b> no.</p>
+		<p><b>The long answer:</b> yes, most of the time.</p>
+		<p>The name of the selected item or category is retrieved only when the <code>{cms_module module="yourmodule"}</code>
+tag is encountered in the template - which is quite always way after
+the page's head. However, in most cases in could be retrieved by a
+user-defined tag (UDT).</p>
+		<p style="text-decoration: underline;">Note
+that this will no work when the tag is directly called on the page, and
+will only work when we are following a module action (when you have
+clicked on a link)</p>
+		<p>Create the following UDT, replacing NAME_OF_YOUR_MODULE with your module's name:</p>
+		<pre class="code">$modulename = 'NAME_OF_YOUR_MODULE';<br>global $gCms;<br>if( isset($gCms-&gt;modules[$modulename]) &amp;&amp;<br>    $gCms-&gt;modules[$modulename]['active'] &amp;&amp;<br>    isset($params['assign']) ){<br>	global $smarty;<br>	$instance = $gCms-&gt;modules[$modulename]['object'];<br>	$glob = $instance-&gt;get_moduleGetVars();<br>	$wantedlevel = false;<br>	$modlevels = $instance-&gt;get_levelarray();<br>	if(isset($glob['alias'])){<br>		$wantedlevel = isset($glob['what'])?$glob['what']:$modlevels[count($modlevels)-1];<br>		$alias = $glob['alias'];<br>	}elseif(isset($glob['parent'])){<br>		if(isset($glob['what'])){<br>			$wantedlevel = $instance-&gt;get_nextlevel($glob['what'], false);<br>		}else{<br>			$wantedlevel =$modlevels[count($modlevels)-2];<br>		}<br>		$alias = $glob['parent'];<br>	}<br>	if($wantedlevel){<br>		$getfunction = 'get_level_'.$wantedlevel;<br>		$item = $instance-&gt;$getfunction(array('alias'=&gt;$alias));<br>		if(isset($item[0]))	$smarty-&gt;assign($params['assign'],$item[0]);<br>	}<br>}<br>	</pre>
+	<p>Let's
+say you've named your tag "retrievemodinfo". Then, at the beginning of
+your page's template, you retrieve the module informations by using the
+tag <code>{retrievemodinfo assign="currentelement"}</code>. This means
+that the information about the current item are stored in the variable
+$currentelement (which could have been anything). So in the
+&lt;title&gt; tag of your template, you could write: <code>{if $currentelement}{$currentelement-&gt;name}{/if}</code>, which would display the name of the current element if it could have been retrieved.</p>
+	<p style="color: red; font-weight: bold;">UPDATE: since version 1.8, you can do the same thing much more easily just by using the "breadcrumbs" action and its parameters.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+
+	<div class="qdiv" id="q16">
+		<div class="question">How can I add module elements to my google sitemap?</div>
+		<div class="answer">
+	<p>This will help you include the module entries to a google sitemap, <u>provided that your module elements are all displayed on the same page</u>.</p><br>
+	<p><b>If you are using the <a href="http://dev.cmsmadesimple.org/projects/gsgenerator">google sitemap generator module</a>:</b></p>
+	<p></p>Open your sitemap generator (gsitemap.php), and just before the closure of the urlset (<code>echo '  &lt;/urlset&gt;'. "\n";</code>), add the following lines:<p></p>
+	<pre class="code">	$modulename = "NAMEOFMODULE";	// CHANGE THIS TO THE NAME OF YOUR MODULE<br>	if(  isset($gCms-&gt;modules[$modulename])<br>		&amp;&amp; $gCms-&gt;modules[$modulename]["active"]<br>		&amp;&amp; $themodule = $gCms-&gt;modules[$modulename]["object"]<br>		){<br>			<br>		// HERE YOU MUST PUT THE ID OR ALIAS OF THE PAGE USED TO DISPLAY THE MODULE ELEMENTS:<br>		$detailpage = "MYPAGE";<br>		<br>		$params = array("mode"=&gt;"google", "detailpage"=&gt;$detailpage);<br>		$themodule-&gt;DoAction("sitemap", "", $params);<br>	}<br>	</pre>
+	<p>Of
+course, replace NAMEOFMODULE in the first line with the name of your
+module, and enter a detailpage, be it an id or page alias.</p>
+	<p>Note
+that you could also use the "what" parameter to specify which levels
+you wish to see displayed (you can specify several levels with
+"level1|level2" and so on). Otherwise, all levels will be displayed.</p><br>
+	<p><b>If you are using the <a href="http://dev.cmsmadesimple.org/projects/sitemapms">SiteMap Made Simple</a> module:</b></p>
+	<p>Simply put the code above in a UDT (user-defined-tag), and call the UDT at the end of your sitemap's template, just before <code>&lt;/urlset&gt;</code>.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+
+
+	<div class="qdiv" id="q19">
+		<div class="question">How can I add an expiration field?</div>
+		<div class="answer">
+	<p>You
+wish to add a date field that will decide when the item will be
+displayed or not (like in the news module). It shouldn't be very hard.</p>
+	<p>To do this, you will need two fields (or three):</p>
+	<ul>
+		<li>A "checkbox" type field to choose whether the expiration date will be used or not (we'll call it "use_expiration")</li>
+		<li>A "date" type field to choose the expiration date (we'll call it "expiration_date")</li>
+		<li>(optionally) Another date field (for begin date)</li>
+	</ul>
+	<p>For simplicity, I will assume we need only one date (you should figure out the part for the second date).</p>
+	<p>In your list template, use the following code:</p>
+	<pre class="code">	{foreach from=$itemlist item="item"}<br>		{if $item-&gt;use_expiration &amp;&amp; ($item-&gt;expiration_date|date_format:"%s" &lt; $smarty.now)}<br>			the code to display the item...<br>		{/if}<br>	{/foreach}<br>	</pre>
+	<p>Basically,
+we only display the item when a condition is met, namely that
+use_expiration is on, and that the expiration date is lower (before)
+the current date. To do the opposite, you can just change the &lt; to a
+&gt;.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+
+
+	<div class="qdiv" id="q20">
+		<div class="question">How can I setup the frontend edit action with the Front End Users module?</div>
+		<div class="answer">
+	<p>This
+is done in two parts. The first part is to display the edit link or
+edit form only to selected users (or logged in users). This is to be
+done with the FEU module (and possibly Custom Content), and as such
+will not be covered here. This is only about <i>hiding</i> the edition
+from other users. The second part, which will be covered here, is about
+the real protection. Sadly, this will require a little programming, but
+everyone should be able to get through this easily.</p>
+	<p>If you're wondering how to change the look of the form, see the frontend_add_*.tpl templates in the templates folder.</p>
+	<p>Before
+editing an item through the frontend, the function feadd_permcheck
+(whose content is in the file function.feadd_permcheck.php) is called.
+If it returns true (if the value of the $return variable is set to
+true), the user has permission to edit the item, otherwise (if it
+returns false), the access is denied.<br> If you open the file
+function.feadd_permcheck.php, you will notice that aside from comments,
+the function is empty. We will have to fill it out depending on what we
+wish to do.</p>
+	<p>The variables at our disposition are the following:</p><ul>
+		<li>$gCms (the global cms object, through which we will be able to call the FEU module)</li>
+		<li>$what (the level of the item we are attempting to edit, as given by the "what" parameter)</li>
+		<li>$alias (the alias of the item we are attempting to edit. If it is a new item, $alias should be false)</li>
+		<li>$itemid (the id of the item we are attempting to edit. If it is a new item, $itemid should be false)</li>
+	</ul><p></p>
+	<p>You might need the following functions of the FEU module:</p><ul>
+		<li>LoggedIn() will return true if the user is logged in, and false otherwise.</li>
+		<li>LoggedInId() will return the id of the user</li>
+		<li>LoggedInName()	will return the username of the user</li>
+		<li>MemberOfGroup($userid,$groupid)		returns true if the user is a member of the group, false otherwise</li>
+		<li>GetGroupID($groupname)	returns the group id associated to a group name</li>
+	</ul><p></p><br>
+	<p>Now, here are four basic examples of how to use this.</p>
+	<p><b>Allowing only logged in users</b><br>
+	Here's how to allow only logged in users to edit items:</p><p>Failsafe:</p>
+	<pre class="code">place the below code in a page with  WYSIWYG turned off:<br><br>{assign var=userids value=$gCms-&gt;modules.FrontEndUsers.object-&gt;LoggedinId()}<br>{assign var=username value=$gCms-&gt;modules.FrontEndUsers.object-&gt;GetUserName($userids)}<br><br>{cms_module module=FrontEndUsers}<br><br>{if $userids!=''}<br><br>{cms_module module="youtubeplayer" action="frontend_edit" what="videos"}<br><br>{/if}<br>	</pre><p></p><p>Or:</p>
+	<pre class="code">	$return = false;<br>	$FEU = $this-&gt;GetModuleInstance('FrontEndUsers');<br>	if($FEU &amp;&amp; $FEU-&gt;LoggedIn()){<br>		$return = true;<br>	}<br>	</pre><br>
+	<p><b>Allowing only members of a group</b><br>
+	Here's how to allow only members of the group "mygroup" to edit items:</p>
+	<pre class="code">	$return = false;<br>	$FEU = $this-&gt;GetModuleInstance('FrontEndUsers');<br>	if($FEU){<br>		if($FEU-&gt;LoggedIn()){<br>			$userid = $FEU-&gt;LoggedInId();<br>			$groupid = $FEU-&gt;GetGroupID("mygroup");<br>			if($FEU-&gt;MemberOfGroup($userid, $groupid)){<br>				$return = true;<br>			}<br>		}<br>	}<br>	</pre><br>
+	<p><b>Allowing members to edit only a single element</b><br>
+Suppose you have a FEU member corresponding to each of your item, and
+that the username of that member is the alias of the item (see below on
+how to do this). You could restrict access in the following way:</p>
+	<pre class="code">	$return = false;<br>	$FEU = $this-&gt;GetModuleInstance('FrontEndUsers');<br>	if($FEU){<br>		if($FEU-&gt;LoggedIn()){<br>			$username = $FEU-&gt;LoggedInName();<br>			if($username == $alias){<br>				$return = true;<br>			}<br>		}<br>	}<br>	</pre>
+	<p>Using $FEU-&gt;GetUserProperty($propertyname), you could use something else than the username.<br>
+	If permissions depend on the alias of the item, you should make sure (see Settings) that your frontend users can't change it.</p><br>
+	<p>Should you need more informations about the item, you can use the following snippet to load the full item object:</p>
+	<pre class="code">	$getfunction = "get_level_".$what;<br>	$itemlist = $this-&gt;$getfunction(array("id"=&gt;$itemid));<br>	$item = isset($itemlist[0])?$itemlist[0]:false;</pre><br>
+	<p>Finally,
+you may use $what variable to have different permission management for
+each level. A switch would be the typical solution:</p>
+	<pre class="code">	switch($what){<br>		case "level1":<br>			// code<br>			break;<br>		case "level2":<br>			//code<br>			break;<br>		...(and so on)<br>	}</pre><br>
+	<p><b>Triggering the creation of a FEU member for each item</b><br>
+If you're using something similar to the last example, you need to have
+a FEU user for each item. This can be done using events.<br>
+	Everytime an item is added, modified or deleted, the modules sends an <i>event</i>
+to the cms. If you go into Extensions -&gt; Event Manager, you should
+find the events sent by your module in the list. Click, for example, on
+the modulename_added event. You will notice that here, you can select a
+User Defined Tag (UDT) that will be called when the event is triggered.
+So we simply need to design an UDT that will add a member when a new
+item is created.</p>
+	<p>We will assume your item has a field named
+"password", which will be used as the FEU password, that your module is
+named "NAMEOFMODULE", and the level is named "MYLEVEL". Look at the
+following UDT:</p>
+		<pre class="code">	// first, we check if an item has been added on the level we're concerned with<br>	if($params["what"] != "MYLEVEL")	return false;<br>	<br>	// we retrieve the two modules<br>	$FEU = $this-&gt;GetModuleInstance('FrontEndUsers');<br>	$mymod = $this-&gt;GetModuleInstance('NAMEOFMODULE');<br>	if(!$FEU || !$mymod)	return false;<br>	<br>	// we then retrieve the item<br>	$itemlist = $mymod-&gt;get_MYLEVEL(array("id"=&gt;$params["itemid"]));<br>	if(!isset($itemlist[0]))	return false;<br>	$item = $itemlist[0];<br>	<br>	// we then add the FEU user<br>	$expires_in = 365; // sets the number of days until expiration<br>	$expires = strtotime(sprintf("+%d days",$expires_in), time());<br>	$FEU-&gt;AddUser($item-&gt;name, $item-&gt;password, $expires);<br>		</pre>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+
+
+	<div class="qdiv" id="q3">
+		<div class="question">Can I change how the pretty urls are generated and interpreted?</div>
+		<div class="answer">
+		<p><b>Yes, to some extent.</b></p>
+		<p>I'll try to make this very comprehensive. Before talking of modying it, let's see how this works.</p>
+		<p>Basically, the module has two kinds of urls:<br>
+		Type A: <code>http://www.mydomain.com/nameofmodule/detail/nameofobject/5/</code><br>
+		and<br>
+		Type B: <code>http://www.mydomain.com/nameofmodule/nameoflevel/nameofparent/5/</code><br>
+		(if you are separating elements into pages, you will notice that type B has some variations... we will discuss this later.)</p>
+		<p>Type
+A is used when we are looking at the details of a last-level object.
+Type B is used when we display a list of items. Now, remember that the
+url has to contain all the information about what should be displayed.
+So let's take a look about what's common to both types of urls:</p>
+		<p>The <b>nameofmodule/</b> tells us that the module should be called.<br>
+		The <b>5/</b>
+(that annoying number) is the returnid of the page. In other words, it
+tells us on what page of the cms the informations of the module should
+be shown. Even though the page content is replaced by what the module
+has to display, this is very important as it determines, for instance,
+what page template should be used.</p>
+		<p>When the <b>/detail/</b> is
+in the url, the module knows that we're displaying the details of a
+last level item. All we need to specify is which item to display, and
+thats the <b>nameofobject</b> part.</p>
+		<p>When the <b>/detail/</b> <i>isn't</i>
+in the url, the module concludes that we are displaying a list of
+something*. The elements of what level are displayed is determined by
+whatever is in the place of "/detail/": in our case, <b>nameoflevel/</b>. A url like <code>http://www.mydomain.com/nameofmodule/product/5/</code> would be valid, and would tell the module to display all elements of the "product" level.<br>
+		The <b>/nameofparent/</b> part tells the module to display only the items of the chosen level that have "nameofparent" as a parent.</p>
+		<p>The
+pretty urls are registered in the SetParameters() function of the main
+module file (which should be something like
+NAMEOFYOURMODULE.module.php). Open this file, and do a search to find
+the function. What matters in there is the lines that look like this
+(without the numbers on the left) :</p>
+		<pre class="code">#1	$this-&gt;RegisterRoute("/[nN]ameofmodule\/([Dd]etail)\/(?P<alias>[^\/]+)\/(?P<returnid>[0-9]+)$/");<br>#2	$this-&gt;RegisterRoute("/[nN]ameofmodule\/(?P<what>[^\/]+)\/(?P<returnid>[0-9]+)$/");<br>#3	$this-&gt;RegisterRoute("/[nN]ameofmodule\/(?P<what>[^\/]+)\/(?P<parent>[^\/]+)\/(?P<returnid>[0-9]+)$/");<br>#4	$this-&gt;RegisterRoute("/[nN]ameofmodule\/(?P<what>[^\/]+)\/(?P<pageindex>[0-9]+)\/(?P<nbperpage>[0-9]+)\/(?P<returnid>[0-9]+)$/");<br>#5	$this-&gt;RegisterRoute("/[nN]ameofmodule\/(?P<what>[^\/]+)\/(?P<parent>[^\/]+)\/(?P<pageindex>[0-9]+)\/(?P<nbperpage>[0-9]+)\/(?P<returnid>[0-9]+)$/");</returnid></nbperpage></pageindex></parent></what></returnid></nbperpage></pageindex></what></returnid></parent></what></returnid></what></returnid></alias></pre>
+		<p>Each line here register a different url structure.<br>
+		Line #1 registers the Type A urls.<br>
+		All the other lines register Type B urls:<br>
+		Line #2 is for when no parent is specified, like in <code>http://www.mydomain.com/nameofmodule/nameoflevel/5</code><br>
+		Line #3 is used when a parent is specified, like in <code>http://www.mydomain.com/nameofmodule/nameoflevel/nameofparent/5</code><br>
+Line #4 is a variation of line #2 that handles separation into pages
+(when we separate into pages, we need to know which page we're looking
+at). For example, <code>http://www.mydomain.com/nameofmodule/product/2/10/5</code>
+would mean that we are looking at the list of all items of the
+"product" level, that we are separating in pages with "10" elements per
+page, and that we are looking at the page "2".<br>
+		In pretty much the same way, line #5 is a variation of line #3.</p>
+		<p>The
+&lt;paramname&gt; thing means that whatever is in that place in the url
+will be interpreted as the "paramname" parameter. In other words, each
+url structure output different parameters that will tell the module
+what to do.</p>
+		<p><b>Modifying all this...</b><br>
+		There are some things that you can change, some that you can't, and some that you can at a price.</p>
+		<p>Let's say you don't like the word "<b>detail</b>"
+in the url, and would like to change it to something else**. First,
+let's not that the "[Dd]" part in the url structure says that there can
+be either a "D" or a "d" here. In other words, <code>http://www.mydomain.com/nameofmodule/detail/nameofobject/5/</code> is the same thing as <code>http://www.mydomain.com/nameofmodule/Detail/nameofobject/5/</code>.<br>
+You can change the word "detail" for something else, but you have to be
+careful and remember that the url carry all necessary information about
+what should be shown. For example, if one of your level is named
+"product", you couldn't replace the word "detail" by the word
+"product". If you did, the module couldn't know if the word "product"
+it encounters means that we're watching the details of an item, or if
+it means that we are watching a list of the items in the "product"
+level.</p>
+		<p>So
+let's say we want to change "detail" for "view" (provided that you
+don't have a level called "view"). In line #1, we would replace <code>([Dd]etail)</code> with <code>(view)</code> (or <code>([Vv]iew)</code>, if you want it to accept both "View" and "view").</p>
+		<p><u>But this is not enough.</u>
+You've changed the way the urls are interpreted, but not the way they
+are created. In the same file, search for the BuildPrettyURLs function.
+It should contain something like this:</p>
+		<pre class="code">#1		$prettyurl = "nameofmodule/";<br>#2		if(isset($params["alias"])){<br>#3			$prettyurl .= "detail/".$params["alias"];<br>#4		}elseif(isset($params["parent"])){<br>#5			$prettyurl .= $params["what"]."/".$params["parent"];<br>#6		}else{<br>#7			$prettyurl .= $params["what"];<br>#8		}<br>#9		if(!isset($params["alias"]) &amp;&amp; isset($params["pageindex"]) &amp;&amp; isset($params["nbperpage"]))	$prettyurl .= "/".$params["pageindex"]."/".$params["nbperpage"];<br>#10		$prettyurl .= "/".$returnid;<br>#11		return $prettyurl;</pre>
+		<p>This function transforms the parameters into a url.<br>
+		Line #1 starts with the module's name.<br>
+		In lines #2-#3, if we want to watch the details of an item, we add the "detail/" block to the url.<br>
+If this isn't the case, we add the level of the items we want to show
+and, if specified, the parent (lines #4 to #8). In line #9, if we're
+separating into pages we add the page we wish to look and the number of
+elements per page. Finally, in line #10, we add the id of the page in
+which it should be displayed.</p>
+		<p>If
+we changed "[Dd]etail" to "[Vv]iew" in the SetParameters() function, we
+must also change the "detail/" in line #3 for "view/".<br>Now, this should do the trick.</p>
+		<p><b>Can I get rid of the returnid?</b><br>No, not really. However, if you the module is <u>always</u> displayed in the same page (i.e., if it's <u>always</u> the same number), we could remove it from the url and provide it in another way. Here's how to do it:</p>
+		<p>Let's say the id of the page in which the module is always called (the number we're trying to get rid of) is 5.<br>
+		1. in the SetParameters() function of your module, remove all <code>\/(?P<returnid>[0-9]+) parts. (it would be a good idea to copy and paste the original lines just in case... you can comment lines using <code>//</code>).<br>
+		2. in the BuildPrettyURLs() function of your module, comment (add <code>//</code> before it) the line #10 (<code>// $prettyurl .= "/".$returnid;</code>).<br>
+		3. we now need to provide the id. Go back to the SetParameters() function, and for each line, just after the <code>$"/</code> part (and before the closure of the parenthesis), add <code>, array("returnid"=&gt;5)</code> (with the comma), where "5" is your id. For example, this:<br>
+		<code>$this-&gt;RegisterRoute("/[nN]ameofmodule\/([Dd]etail)\/(?P<alias>[^\/]+)$/");<br>
+		should become:<br>
+		<code>$this-&gt;RegisterRoute("/[nN]ameofmodule\/([Dd]etail)\/(?P<alias>[^\/]+)$/", array("returnid"=&gt;5));<br>
+		(Remember not just to copy and paste lines from this help, because your module is probably <i>not</i> named "nameofmodule")<br>
+		This should do the trick, but the module will never use another page to display its content.</alias></code></alias></code></returnid></code></p>
+		<p><u>Final notice:</u>
+If you change the pretty urls and make use of the "is_selected"
+attributes in your templates, you might also have to change the
+get_moduleGetVars() function (take a look <a href="#q14">here</a>).</p>
+		<p style="font-size: 11px;"><br>*
+if there is only one item to display, and if you aren't using the
+"forcelist" parameter, the details will be displayed instead of a list.<br>
+** no, you can't just get rid of it, unless you change all registered
+urls... for example, instead of having a "/detail/", all other urls
+could have a "/list/" block.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+
+	<div class="qdiv" id="q8">
+		<div class="question">Can I make my module always act as if the "forcelist" parameter was enabled?</div>
+		<div class="answer">
+		<p style="color: red; font-weight: bold;">Since 1.8.6, this has become a simple option to turn on in the "Settings" tab...</p>
+		<p><b>Yes.</b></p>
+		<p>Open the action.default.php file. Around the line #16 you should see something like this:</p>
+		<pre class="code">		$forcelist = isset($params["forcelist"])?$params["forcelist"]:false;</pre>
+		<p>What this says is that if the forcelist parameter has been set, we use this value, and if it hasn't, we use the value "false".<br>
+		Changing this <code>false</code> to a <code>true</code> would mean that the forcelist mode is always enabled, unless specified otherwise.<br>
+But that's not exactly what we want, for this would mean that we always
+display a list, even when we're trying to display an item's details. So
+the proper code would be:</p>
+		<pre class="code">		$forcelist = isset($params["forcelist"])?$params["forcelist"]:(isset($params["alias"])?false:true);</pre>
+		<p>This way, $forcelist will be false unless specified otherwise, and unless an alias (used in detail links) is specified.</p>
+		<p>(Two lines below, you could do the same kind of thing for the "inline" parameter...)</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>
+	
+	
+	<div class="qdiv" id="q14">
+		<div class="question">What's with this get_moduleGetVars() function?</div>
+		<div class="answer">
+		<p><b>What is it for? And why is it such a mess?</b></p>
+		<p>In
+the main module file, there is a function called get_moduleGetVars().
+Basically, the function retrieve the module action parameters from the
+url.<br> Imagine that in your template, in a column on the left, you
+call the module to display a category list. When you click on an
+category, the list stays there, but the main content block displays the
+children within that category. Now, in the category list, you might
+want to show which category is selected (using the
+$item-&gt;is_selected attribute). But the problem is that the category
+list is called <i>before</i> the main module action (the list of children), and thus the action parameters aren't yet parsed.<br>
+		This subject has been discussed in the forums (<a href="http://forum.cmsmadesimple.org/index.php/topic,33334.0.html">here</a>),
+and I chose the solution that is the easiest to implement for the user:
+retrieve the parameters from the url even before they are parsed by the
+cms. It's a rather complicated function because we need to deal with
+the possibility of prettyurls and rewritten urls...<br> Of course, it
+means that if you wish to change the way prettyurls are made and still
+use the is_selected attribute, you're gonna have to play in this
+inelegant code. But hey, I'm writing this just to make it clearer...</p>
+		<br><p><b>How does it work, and how to change it?</b></p>
+		<p>Before we go, here's a look at the function:</p>
+		<pre class="code">	function get_moduleGetVars(){<br>#1		// unorthodox hack so that different calls of the module speak with each other<br>#2		// basically, we retrieve parameters in the url that were meant for other instances of the module<br>#3		global $_GET;<br>#4		global $gCms;<br>#5		$globalmodulevars = array();<br>#6		if(isset($_GET["mact"])){<br>#7			// if we aren't using pretty urls...<br>#8			$modinfo = explode(",",$_GET["mact"]);<br>#9			if(isset($modinfo) &amp;&amp; $modinfo[0] == $this-&gt;GetName()){<br>#10				if(isset($_GET[$modinfo[1]."parent"]))<br>#11					$globalmodulevars["parent"]=$_GET[$modinfo[1]."parent"];<br>#12				if(isset($_GET[$modinfo[1]."what"]))<br>#13					$globalmodulevars["what"]=$_GET[$modinfo[1]."what"];<br>#14				if(isset($_GET[$modinfo[1]."alias"]))<br>#15					$globalmodulevars["alias"]=$_GET[$modinfo[1]."alias"];<br>#16				if(isset($_GET[$modinfo[1]."pageindex"]))<br>#17					$globalmodulevars["pageindex"]=$_GET[$modinfo[1]."pageindex"];<br>#18			}<br>#19		}elseif($gCms-&gt;config["internal_pretty_urls"] || $gCms-&gt;config["assume_mod_rewrite"]){<br>#20			$params = array();<br>#21			if($gCms-&gt;config["assume_mod_rewrite"] &amp;&amp; isset($_GET["page"])){<br>#22				// if we are using an external mod_rewrite, assuming you are using the very<br>#23				// basic rewrite which puts the module informations inside the page variable<br>#24				$parts = explode("/",$_GET["page"]);<br>#25				foreach($parts as $part){<br>#26					if($part != "")	$params[] = $part;<br>#27				}<br>#28			}elseif(!$gCms-&gt;config["assume_mod_rewrite"] &amp;&amp; $gCms-&gt;config["internal_pretty_urls"] &amp;&amp; isset($_SERVER["REQUEST_URI"])){<br>#29				// if we are using the internal pretty urls<br>#30				$parts = explode("/",$_SERVER["REQUEST_URI"]);<br>#31				$started = false;<br>#32				foreach($parts as $part){<br>#33					if($started &amp;&amp; $part != "")	$params[] = $part;<br>#34					if(strtolower($part) == "index.php")	$started = true;<br>#35				}<br>#36			}<br>#37			if(isset($params[0]) &amp;&amp; strtolower($params[0]) == strtolower($this-&gt;GetName())){<br>#38				 // we are in a module action<br>#39				if(!isset($params[1]) || strtolower($params[1]) == "query"){<br>#40<br>#41				}elseif(isset($params[1]) &amp;&amp; strtolower($params[1]) == "detail"){<br>#42					$globalmodulevars["what"] = "tsuba";<br>#43					$globalmodulevars["alias"] = $params[2];<br>#44				}else{<br>#45					$globalmodulevars["what"] = $params[1];<br>#46					switch(count($params)){<br>#47						case 6:<br>#48							$globalmodulevars["pageindex"] = $params[3];<br>#49							$globalmodulevars["nbperpage"] = $params[4];<br>#50						case 4:<br>#51							$globalmodulevars["parent"] = $params[2];<br>#52							break;<br>#53						case 5:<br>#54							$globalmodulevars["pageindex"] = $params[2];<br>#55							$globalmodulevars["nbperpage"] = $params[3];<br>#56							break;<br>#57					}<br>#58				}<br>#59			}<br>#60		}<br>#61		return $globalmodulevars;<br>	}</pre>
+		<p>Now there are four possible scenarios:<br>
+		1. There is no rewrite or prettyurls at all (that's the easiest... lines 7 to 18 deal with this)<br>
+		2. We are using internal prettyurls without mod_rewrite (lines 29 to 35, and 37 to 59)<br>
+		3. We are using internal prettyurls along with the standard assumed mod_rewrite (lines 22 to 37, and 37 to 59)<br>
+4. We are using a non-standard mod_rewrite... in that case, you'll
+either have to forget about the is_selected attribute or to write the
+code yourself.</p>
+		<p><b>Case 1: good ol' urls</b><br>
+If we find the "mact" in the GET parameters, then we are dealing with
+standard urls. We just have to break the mact value into pieces, make
+sure it's an action of our module, and retrieve the different
+parameters by their name (along with the $id).</p>
+		<p><b>Case 2: internal pretty urls</b><br>
+Lines 29 to 35 retrieve the url, separate it into parts (each part
+being a fake folder in the url), and only keep the parts that are after
+the "index.php/".</p>
+		<p>Lines 37 to 59 try to figure just what parameters these parts could be. Remember that we had the following routes registered:</p>
+		<pre class="code">#1	$this-&gt;RegisterRoute("/[nN]ameofmodule\/([Dd]etail)\/(?P<alias>[^\/]+)\/(?P<returnid>[0-9]+)$/");<br>#2	$this-&gt;RegisterRoute("/[nN]ameofmodule\/(?P<what>[^\/]+)\/(?P<returnid>[0-9]+)$/");<br>#3	$this-&gt;RegisterRoute("/[nN]ameofmodule\/(?P<what>[^\/]+)\/(?P<parent>[^\/]+)\/(?P<returnid>[0-9]+)$/");<br>#4	$this-&gt;RegisterRoute("/[nN]ameofmodule\/(?P<what>[^\/]+)\/(?P<pageindex>[0-9]+)\/(?P<nbperpage>[0-9]+)\/(?P<returnid>[0-9]+)$/");<br>#5	$this-&gt;RegisterRoute("/[nN]ameofmodule\/(?P<what>[^\/]+)\/(?P<parent>[^\/]+)\/(?P<pageindex>[0-9]+)\/(?P<nbperpage>[0-9]+)\/(?P<returnid>[0-9]+)$/");</returnid></nbperpage></pageindex></parent></what></returnid></nbperpage></pageindex></what></returnid></parent></what></returnid></what></returnid></alias></pre>
+		<p>Route
+#1 is handled by the lines 41-43. Otherwise, it will depend on the
+number of parameters. If there are 6, we know we're using route #5 :
+$params[0] is the name of the module, $params[1] the name of the level
+(what), $params[2] the name of the parent, $params[3] the pageindex,
+and so on...<br> Likewise, if we have 5 params, we know we're using
+route #4, and with 4 params, we know we're using route #3. If we were
+using route #2, there wouldn't be anything to retrieve anyway.<br>
+		If the module action is a query (lines 39-40), we don't retrieve anything...</p>
+		<p>So basically, if you change the routes, you've got to change lines 37 to 59.</p>
+		<p><b>Case 3: internal pretty urls with standard mod_rewrite</b><br>
+In this case, the path that's after "index.php/" in case 2 is simply
+passed through the "page" GET parameter. So once we've retrieved it,
+the task is just like case 2.</p>
+		</div>
+		<a class="backtotop" href="#top">Back to top</a>
+	</div>		
+		
+</div>
+<p align="right">Pierre-Luc Germain</p>
+</body></html>
