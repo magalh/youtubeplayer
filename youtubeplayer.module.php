@@ -1,7 +1,7 @@
 <?php
 #-------------------------------------------------------------------------
-# Module: youtubeplayer
-# Version: 1.2, 
+# Module: yYouTubePlayer
+# Version: 2.0, 
 #
 #-------------------------------------------------------------------------
 # CMS - CMS Made Simple is (c) 2008 by Ted Kulp (wishy@cmsmadesimple.org)

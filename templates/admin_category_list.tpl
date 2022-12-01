@@ -1,9 +1,15 @@
-{if $filter || $instantsearch}<div style="float: right; text-align: right;">{$filter}{if $filter && $instantsearch}<br/>{/if}{$instantsearch}</div>{/if}
+{*if $filter || $instantsearch}<div style="float: right; text-align: right;">{$filter}{if $filter && $instantsearch}<br/>{/if}{$instantsearch}</div>{/if*}
 
 {cms_action_url action=editB assign='edit_url'}
 {cms_action_url action=admin_deletecomment assign='delete_url'}
 
-<p>{$addnew} {$reorder}</p>
+<div class="pageoptions">
+         <a href="{cms_action_url action=editA}">{admin_icon icon='newobject.gif'}
+            {$mod->Lang('add_category')}
+         </a>
+       </div>
+
+<p>{*$reorder*}</p>
 {if !empty($itemlist)}
 <table class="pagetable cms_sortable tablesorter">
  <thead>
@@ -24,4 +30,4 @@
 {/foreach}
   </tbody>
 </table>
-<p>{$addnew}</p>{/if}
+<p></p>{/if}

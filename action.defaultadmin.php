@@ -49,23 +49,27 @@ echo $this->StartTabContent();
 if( $has_advanced_perm || $this->GetPreference("tabdisplay_category",false) || $this->CheckPermission(YouTubePlayer::PERM_CAT) ) {
 	echo $this->StartTab("category");
 
+		$tpl = $smarty->CreateTemplate($this->GetTemplateResource('admin_category_list.tpl'),null,null,$smarty);
+       
+       
 		$whereclause = array();
 		$filteroutput = false;
 
-		$this->smarty->assign("filter", $filteroutput);
-		$this->smarty->assign("instantsearch", $instantsearch?$this->Lang("searchthistable")." ".$this->CreateInputText($id, "searchtable_category", "", 10, 64, ' onkeyup="ctlmm_search(this.value,\'category_table\');"'):false);
+		$tpl->assign('filter',$filteroutput);
 		
-		$this->smarty->assign("addnew", $this->CreateLink($id, "editA", $returnid, $admintheme->DisplayImage("icons/system/newobject.gif", "","","","systemicon")." ".$this->Lang("add_category")));
+
+		//$this->smarty->assign("instantsearch", $instantsearch?$this->Lang("searchthistable")." ".$this->CreateInputText($id, "searchtable_category", "", 10, 64, ' onkeyup="ctlmm_search(this.value,\'category_table\');"'):false);
+		
+		//$this->smarty->assign("addnew", $this->CreateLink($id, "editA", $returnid, $admintheme->DisplayImage("icons/system/newobject.gif", "","","","systemicon")." ".$this->Lang("add_category")));
 		$reorder_btn = false;
 		if($has_advanced_perm || !$this->GetPreference("restrict_permissions",false) || $this->CheckPermission(YouTubePlayer::PERM_CAT)){
 			$reorder_btn = $this->CreateLink($id, "reorder", $returnid, $admintheme->DisplayImage("icons/system/reorder.gif", "","","","systemicon")." ".$this->Lang("reorder"));
 		}
-
-		$this->smarty->assign("reorder", $reorder_btn);
+		$tpl->assign('reorder',$reorder_btn);
 		
 			$itemlist = $this->get_level_category(isset($whereclause)?$whereclause:array(),true, $id, $returnid);
 			$this->smarty->assign("tableid", "category_table");
-			$this->smarty->assign("itemlist", $itemlist);
+			$tpl->assign('itemlist',$itemlist);
 			$adminshow = array(
 				array($this->Lang("name"),"editlink",false),
 				array($this->Lang("active"),"toggleactive",true),
@@ -80,7 +84,7 @@ if( $has_advanced_perm || $this->GetPreference("tabdisplay_category",false) || $
 				}
 			}
 			$this->smarty->assign("adminshow", $adminshow);
-			echo $this->ProcessTemplate("adminpanel.tpl");
+			$tpl->display();
 
 	echo $this->EndTab();
 
@@ -138,7 +142,7 @@ if( $has_advanced_perm || $this->GetPreference("tabdisplay_videos",false) || $th
 				}
 			}
 			$this->smarty->assign("adminshow", $adminshow);
-			echo $this->ProcessTemplate("adminpanel.tpl");
+			echo $this->ProcessTemplate("admin_category_list.tpl");
 
 	}else{
 		echo "<p>".$this->Lang("error_noparent")."</p>";
@@ -197,7 +201,7 @@ if( $has_advanced_perm || $this->CheckPermission("Modify Templates") || $this->G
 	$this->smarty->assign("addnew", $this->CreateLink($id, "editTemplate", $returnid, $admintheme->DisplayImage("icons/system/newobject.gif", "","","","systemicon")." ".$this->Lang("addtemplate")));
     $adminshow = array(	array($this->Lang("template"), "editlink"), array($this->Lang("Actions"), "deletelink")	);
     $this->smarty->assign("adminshow", $adminshow);
-    echo $this->ProcessTemplate("adminpanel.tpl");
+    echo $this->ProcessTemplate("admin_category_list.tpl");
 	echo $this->EndTab();
 }
 
@@ -212,7 +216,7 @@ if( $has_advanced_perm || $this->GetPreference("tabdisplay_queries",false) ) {
 							);
 		$this->smarty->assign("adminshow", $adminshow);
 		$this->smarty->assign("addnew", $this->CreateLink($id, "adminquery", $returnid, $admintheme->DisplayImage("icons/system/newobject.gif", "","","","systemicon")." ".$this->Lang("createquery")));
-		echo $this->ProcessTemplate("adminpanel.tpl");
+		echo $this->ProcessTemplate("admin_category_list.tpl");
 		
 	echo $this->EndTab();
 }
